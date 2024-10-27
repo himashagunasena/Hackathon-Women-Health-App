@@ -7,12 +7,16 @@ class BaseScrollableView extends StatelessWidget {
   final String title;
   final String subtitle;
   final Widget child;
+  final Widget? button;
+  final double? headAndBodySpace;
 
   const BaseScrollableView({
     Key? key,
     required this.title,
     required this.subtitle,
     required this.child,
+    this.button,
+    this.headAndBodySpace,
   }) : super(key: key);
 
   @override
@@ -32,7 +36,8 @@ class BaseScrollableView extends StatelessWidget {
                 },
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 24),
+                padding:
+                    EdgeInsets.only(top: 24, bottom: headAndBodySpace ?? 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -60,6 +65,7 @@ class BaseScrollableView extends StatelessWidget {
                   child: child,
                 ),
               ),
+              button ?? const SizedBox.shrink(),
             ],
           ),
         ),

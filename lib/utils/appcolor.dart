@@ -10,5 +10,8 @@ class AppColors {
   static const lightTextColor = Color(0xFFFFFFFF);
   static const hintTextColor = Color(0xFF616161);
   static const borderColor = Color(0xFF959595);
+  static const neutralColor = Color(0xFFFFC130);
+  static const goodColor = Color(0xFF64AA2B);
+  static const badColor = Color(0xFFAA2B2B);
 
 }

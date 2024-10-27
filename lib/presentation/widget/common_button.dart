@@ -7,6 +7,7 @@ class CommonButton extends StatelessWidget {
   final Color? textColor;
   final bool enabled;
   final double margin;
+  final double? width;
   final Color? buttonColor;
 
   const CommonButton(
@@ -16,12 +17,12 @@ class CommonButton extends StatelessWidget {
       this.margin = 0.0,
       this.buttonColor = AppColors.primaryColor,
       required this.text,
-      required this.clickCallback});
+      required this.clickCallback,  this.width});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width,
+      width:width?? MediaQuery.of(context).size.width,
       margin: EdgeInsets.only(left: margin, right: margin),
       decoration: BoxDecoration(
           color: buttonColor,
