@@ -1,3 +1,5 @@
+import 'package:blossom_health_app/models/user_model.dart';
+import 'package:blossom_health_app/presentation/screen/image_base_health_tracker.dart';
 import 'package:blossom_health_app/presentation/widget/advice_card.dart';
 import 'package:blossom_health_app/presentation/widget/rectangle_card.dart';
 import 'package:blossom_health_app/utils/enum.dart';
@@ -7,10 +9,9 @@ import '../../../utils/appcolor.dart';
 import '../widget/square_card.dart';
 
 class Dashboard extends StatefulWidget {
-  final UserType userType;
-  final String name;
+  final UserModel userModel;
 
-  const Dashboard({super.key, required this.userType, required this.name});
+  const Dashboard({super.key, required this.userModel});
 
   @override
   State<Dashboard> createState() => _DashboardState();
@@ -41,7 +42,7 @@ class _DashboardState extends State<Dashboard> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Image.asset(
-                      widget.userType == UserType.USER
+                      widget.userModel.role == "User"
                           ? "assets/images/user_profile.png"
                           : "assets/images/doctor_profile.png",
                       height: 48,
@@ -56,7 +57,7 @@ class _DashboardState extends State<Dashboard> {
                             fontSize: 18),
                         children: [
                           TextSpan(
-                            text: widget.name,
+                            text: widget.userModel.nickName,
                             style: const TextStyle(
                               fontWeight: FontWeight.w700,
                               color: AppColors.primaryColor,
@@ -106,12 +107,12 @@ class _DashboardState extends State<Dashboard> {
                   ),
                   SquareCard(
                     text: 'Image Based Disease Checker',
-                    clickCallback: () {},
+                    clickCallback: () => _imageBasedHealthTracker,
                     color: AppColors.secondaryCardColor,
                     image: "assets/images/checking.png",
                   ),
                   SquareCard(
-                    text: widget.userType == UserType.USER
+                    text: widget.userModel.role == "User"
                         ? 'Find a Doctor'
                         : 'Manage Appointments',
                     clickCallback: () {},
@@ -126,7 +127,7 @@ class _DashboardState extends State<Dashboard> {
                 clickCallback: () {},
                 color: AppColors.primaryColor,
                 image: "assets/images/blog.png",
-                description: widget.userType == UserType.USER
+                description: widget.userModel.role == "User"
                     ? "Let's talk about your health openly. Feel free to ask any questions, without hesitation."
                     : "Support women’s health and share your knowledge with the community",
               ),
@@ -137,10 +138,12 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-// void _register() {
-//   Navigator.push(
-//     context,
-//     MaterialPageRoute(builder: (context) => const Dashboard()),
-//   );
-// }
+  void _imageBasedHealthTracker() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => DiseaseCheckerScreen(
+              city: widget.userModel.city, country: widget.userModel.country)),
+    );
+  }
 }

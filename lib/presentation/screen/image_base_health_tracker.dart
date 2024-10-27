@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:blossom_health_app/presentation/screen/find_doctor.dart';
 import 'package:blossom_health_app/presentation/widget/common_button.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,9 @@ import '../../utils/prompts.dart';
 import '../widget/base_view.dart';
 
 class DiseaseCheckerScreen extends StatefulWidget {
-  const DiseaseCheckerScreen({super.key});
+  final String? city;
+  final String? country;
+  const DiseaseCheckerScreen({super.key, this.city, this.country});
 
   @override
   State<DiseaseCheckerScreen> createState() => _DiseaseCheckerScreenState();
@@ -23,6 +26,9 @@ class _DiseaseCheckerScreenState extends State<DiseaseCheckerScreen> {
   GenerativeModel? _model;
   String? text;
   String? des;
+  String? doctorSpec;
+  String? doctorWorks;
+  String? diseaseName;
   XFile? _image;
   bool isLoading = false;
   final picker = ImagePicker();
@@ -46,6 +52,30 @@ class _DiseaseCheckerScreenState extends State<DiseaseCheckerScreen> {
       title: 'Disease Checker',
       subtitle:
           'Check your health and get AI-based advice instantly with our self-assessment tool',
+      button: isLoading ||
+              _image == null ||
+              double.tryParse(des ?? "0") == 100 ||
+              des == "e"
+          ? const SizedBox.shrink()
+          : Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: CommonButton(
+                text: "Guideline To Find A Doctor",
+                clickCallback: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => FindDoctorScreen(
+                              disease: diseaseName,
+                              doctorList: doctorList(),
+                          doctorWork: doctorWorksList(),
+                          country: widget.country,
+                          city: widget.city,
+                            )),
+                  );
+                },
+              ),
+            ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -138,6 +168,9 @@ class _DiseaseCheckerScreenState extends State<DiseaseCheckerScreen> {
     try {
       var prompt1 = Prompt.diseaseAnalysis;
       var prompt2 = Prompt.diseaseAnalysisValue;
+      var prompt3 = Prompt.doctorDetails;
+      var prompt4 = Prompt.diseaseName;
+
       var imgBytes = await image.readAsBytes();
       var mimeType = lookupMimeType(_image!.path) ?? 'image/unknown';
 
@@ -147,21 +180,37 @@ class _DiseaseCheckerScreenState extends State<DiseaseCheckerScreen> {
       final value = [
         Content.multi([TextPart(prompt2), DataPart(mimeType, imgBytes)]),
       ];
+      final doctor = [
+        Content.multi([TextPart(prompt3), DataPart(mimeType, imgBytes)]),
+      ];
+      final name = [
+        Content.multi([TextPart(prompt4), DataPart(mimeType, imgBytes)]),
+      ];
 
       final response = await _model?.generateContent(content);
       final percentage = await _model?.generateContent(value);
+      final doctorDetails = await _model?.generateContent(doctor);
+      final nameOfDisease = await _model?.generateContent(name);
+
 
       setState(() {
         text = response?.text ?? "Failed to generate text.";
-
         des = percentage?.text ?? "0";
+        doctorSpec = doctorDetails?.text ?? "";
+        diseaseName = nameOfDisease?.text ?? "";
       });
+
+      var prompt5 = "provide explanations what is the job of $doctorSpec for $diseaseName . Separate each explanation by a comma and return only how to work with disease each doctors don't return specialization name or any title.";
+      final work = [Content.text(prompt5)];
+      final workLoad = await _model?.generateContent(work);
+      doctorWorks = workLoad?.text ?? "";
     } catch (e) {
       setState(() {
         text = "Error: ${e.toString()}";
         des = "e";
       });
     }
+
   }
 
   Future<void> gallery() async {
@@ -204,9 +253,9 @@ class _DiseaseCheckerScreenState extends State<DiseaseCheckerScreen> {
   Color healthState() {
     if (des != "e" && des != null) {
       double value = double.tryParse(des ?? "0") ?? 0;
-      if (value > 80) {
+      if (value ==100) {
         return AppColors.goodColor;
-      } else if (value > 20) {
+      } else if (value > 40) {
         return AppColors.neutralColor;
       }
       return AppColors.badColor;
@@ -225,5 +274,13 @@ class _DiseaseCheckerScreenState extends State<DiseaseCheckerScreen> {
       return "Critical Health Condition";
     }
     return "";
+  }
+
+  List<String>? doctorList() {
+    List<String>? value = doctorSpec?.split(',');
+    return value;
+  }  List<String>? doctorWorksList() {
+    List<String>? value = doctorWorks?.split(',');
+    return value;
   }
 }

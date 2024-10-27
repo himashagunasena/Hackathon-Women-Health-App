@@ -1,15 +1,19 @@
+import 'package:blossom_health_app/models/user_model.dart';
 import 'package:blossom_health_app/presentation/screen/onboarding_screen/sign_up_password.dart';
 import 'package:blossom_health_app/presentation/widget/common_button.dart';
 import 'package:blossom_health_app/presentation/widget/common_textfield.dart';
 import 'package:blossom_health_app/utils/enum.dart';
 import 'package:blossom_health_app/utils/style.dart';
 import 'package:country_picker/country_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 import '../../../utils/appcolor.dart';
+import '../../widget/alert.dart';
 
-
+User? user;
 
 class PersonalDetailsScreen extends StatefulWidget {
   final UserType userType;
@@ -46,9 +50,12 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
   String countryImage = "";
   String countryPhoneCode = "";
   String countryCode = "LK";
+  String? message = "";
+  bool visibleWarning = false;
 
   @override
   initState() {
+    birthdayController.text = DateFormat('yyyy/MM/dd').format(DateTime.now());
     countryController.text = "Sri Lanka";
     countryImage = Country.parse('Sri Lanka').flagEmoji;
     countryPhoneCode = Country.parse('Sri Lanka').phoneCode;
@@ -64,8 +71,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
     );
     if (pickedDate != null) {
       setState(() {
-        birthdayController.text =
-            "${pickedDate.year}/${pickedDate.month}/${pickedDate.day}";
+        birthdayController.text = DateFormat('yyyy/MM/dd').format(pickedDate);
       });
     }
   }
@@ -78,11 +84,14 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
           child: Column(
-           crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               GestureDetector(
-               child:  const Icon(Icons.arrow_back_ios_new_rounded,size: 24,),
+                child: const Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  size: 24,
+                ),
                 onTap: () => Navigator.of(context).pop(),
               ),
               const SizedBox(height: 24),
@@ -143,11 +152,24 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                       CommonTextField(
                         labelText: "Birthday (YYYY / MM / DD)",
                         controller: birthdayController,
-                        keyBoardType: TextInputType.number,
+                        keyBoardType: TextInputType.datetime,
                         format: [
-                          DateTextInputFormatter(),
                           LengthLimitingTextInputFormatter(10),
                         ],
+                        onChange: (value) {
+                          setState(() {
+                            // if (birthdayController.text
+                            //     .length == 4) {
+                            //   birthdayController.text =
+                            //   "${birthdayController.text}/";
+                            // }
+                            // if (birthdayController.text
+                            //     .length == 7) {
+                            //   birthdayController.text =
+                            //   "${birthdayController.text}/";
+                            // }
+                          });
+                        },
                         iconButton: IconButton(
                           icon: Image.asset(
                             "assets/images/ic_calendar.png",
@@ -168,14 +190,16 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                             : "Address",
                         controller: addressController,
                       ),
-                      widget.userType == UserType.DOCTOR?  Padding(
-                        padding:  EdgeInsets.only(top: columnSpace),
-                        child: CommonTextField(
-                          labelText: "Specialization",
-                          controller: cityController,
-                          hint: "Ex: Dermatologist",
-                        ),
-                      ):const SizedBox.shrink(),
+                      widget.userType == UserType.DOCTOR
+                          ? Padding(
+                              padding: EdgeInsets.only(top: columnSpace),
+                              child: CommonTextField(
+                                labelText: "Specialization",
+                                controller: specializationController,
+                                hint: "Ex: Dermatologist",
+                              ),
+                            )
+                          : const SizedBox.shrink(),
                       SizedBox(height: columnSpace),
                       CommonTextField(
                         labelText: "City",
@@ -185,7 +209,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                       country(),
                       widget.userType == UserType.DOCTOR
                           ? Padding(
-                              padding:  EdgeInsets.only(top: columnSpace),
+                              padding: EdgeInsets.only(top: columnSpace),
                               child: CommonTextField(
                                 labelText: "Official Contact Number",
                                 controller: contactController,
@@ -195,8 +219,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                                   style: const TextStyle(fontSize: 18),
                                 ),
                                 format: [
-                                  DateTextInputFormatter(),
-                                  LengthLimitingTextInputFormatter(12),
+                                  LengthLimitingTextInputFormatter(9),
                                 ],
                                 onChange: (value) {
                                   setState(() {
@@ -207,7 +230,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                               ),
                             )
                           : const SizedBox.shrink(),
-                       Padding(
+                      Padding(
                         padding: EdgeInsets.symmetric(vertical: columnSpace),
                         child: const Text(
                           'Terms and conditions',
@@ -254,6 +277,16 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                 ),
               ),
               const SizedBox(height: 12),
+              message != "" && visibleWarning == true
+                  ? Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Alerts().warningCardAlert(message, () {
+                        setState(() {
+                          visibleWarning = false;
+                        });
+                      }),
+                    )
+                  : const SizedBox.shrink(),
               CommonButton(
                 text: "Next",
                 clickCallback: () => _next(),
@@ -306,33 +339,66 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
 
   void _next() {
     setState(() {
+      if (emailController.text.isEmpty) {
+        message = "Please enter your email";
+        visibleWarning = true;
+        return;
+      } else if (fullNameController.text.isEmpty) {
+        message = "Please enter your full name";
+        visibleWarning = true;
+        return;
+      } else if (nickNameController.text.isEmpty) {
+        message = "Please enter your nickname";
+        visibleWarning = true;
+        return;
+      } else if (cityController.text.isEmpty) {
+        message = "Please enter your city";
+        visibleWarning = true;
+        return;
+      } else if (countryController.text.isEmpty) {
+        message = "Please enter your country";
+        visibleWarning = true;
+        return;
+      } else if (birthdayController.text.isEmpty) {
+        message = "Please enter your birthday";
+        visibleWarning = true;
+        return;
+      } else if (widget.userType == UserType.DOCTOR &&
+          specializationController.text.isEmpty) {
+        message = "Please enter your specialization";
+        visibleWarning = true;
+        return;
+      } else if (widget.userType == UserType.DOCTOR && _phoneNumber.isEmpty) {
+        message = "Please enter your phone number";
+        visibleWarning = true;
+        return;
+      } else if (agree == false) {
+        message =
+            "Sorry, We cannot proceed without agree with our Terms and Conditions";
+        visibleWarning = true;
+        return;
+      }
+      UserModel userModel = UserModel(
+        uid: user?.uid,
+        fullName: fullNameController.text,
+        nickName: nickNameController.text,
+        email: emailController.text,
+        phoneNumber: _phoneNumber ?? "",
+        address: addressController.text,
+        city: cityController.text.toLowerCase(),
+        country: countryController.text,
+        birthday: DateFormat('yyyy/MM/dd').parse(birthdayController.text),
+        role: widget.userType == UserType.DOCTOR ? "Doctor" : "User",
+        specialization: specializationController.text.toLowerCase() ?? "",
+      );
+
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const SetPasswordScreen()),
+        MaterialPageRoute(
+            builder: (context) => SetPasswordScreen(
+                  userModel: userModel,
+                )),
       );
     });
-  }
-}
-
-class DateTextInputFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
-    final text = newValue.text;
-    if (newValue.selection.baseOffset == 0) {
-      return newValue;
-    }
-    String newText = text.replaceAll('/', '');
-    if (newText.length >= 5) {
-      newText = '${newText.substring(0, 4)}/${newText.substring(4)}';
-    }
-    if (newText.length >= 8) {
-      newText = '${newText.substring(0, 7)}/${newText.substring(7)}';
-    }
-
-    return TextEditingValue(
-      text: newText,
-      selection: TextSelection.collapsed(offset: newText.length),
-    );
   }
 }

@@ -8,13 +8,14 @@ class CommonTextField extends StatelessWidget {
   final String labelText;
   final String? hint;
   final TextEditingController controller;
-  final IconButton? iconButton;
+  final Widget? iconButton;
   final Widget? prefix;
   final TextInputType? keyBoardType;
   final List<TextInputFormatter>? format;
   final VoidCallback? onTap;
-  final Function? onChange;
+  final Function(String)? onChange;
   final bool readOnly;
+  final bool obscureText;
 
   CommonTextField(
       {required this.labelText,
@@ -22,7 +23,7 @@ class CommonTextField extends StatelessWidget {
       this.iconButton,
       this.keyBoardType,
       this.format,
-      this.onChange, this.onTap, this.prefix, this.readOnly=false, this.hint});
+      this.onChange, this.onTap, this.prefix, this.readOnly=false, this.hint,  this.obscureText=false});
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +42,8 @@ class CommonTextField extends StatelessWidget {
           keyboardType: keyBoardType,
           inputFormatters: format,
           onTap: onTap,
-          onChanged:(value)=> onChange,
+          onChanged:onChange,
+          obscureText: obscureText,
           decoration: Style().textFieldDecoration(iconButton, prefix, hint,readOnly),
         ),
       ],
