@@ -1,6 +1,7 @@
 import 'package:blossom_health_app/utils/extensions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import '../../utils/appcolor.dart';
 
 class DoctorCard extends StatelessWidget {
@@ -9,6 +10,8 @@ class DoctorCard extends StatelessWidget {
   final String city;
   final String country;
   final String? phoneNumber;
+  final String? specialist;
+  final Function? onTapPhoneNumber;
 
   const DoctorCard({
     super.key,
@@ -17,6 +20,7 @@ class DoctorCard extends StatelessWidget {
     this.phoneNumber,
     required this.city,
     required this.country,
+    this.specialist, this.onTapPhoneNumber,
   });
 
   @override
@@ -36,6 +40,15 @@ class DoctorCard extends StatelessWidget {
                 color: AppColors.textColor,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.left,
+            ),
+            Text(
+              specialist ?? "",
+              style: const TextStyle(
+                color: AppColors.textColor,
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
               ),
               textAlign: TextAlign.left,
             ),
@@ -62,15 +75,42 @@ class DoctorCard extends StatelessWidget {
                     ),
                     textAlign: TextAlign.left,
                   ),
-            phoneNumber==""?const SizedBox.shrink():  Text(
-              phoneNumber ?? "",
-              style: const TextStyle(
-                color: AppColors.textColor,
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-              ),
-              textAlign: TextAlign.left,
-            ),
+            phoneNumber == ""
+                ? const SizedBox.shrink()
+                : Text(
+                    phoneNumber ?? "",
+                    style: const TextStyle(
+                      color: AppColors.textColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    textAlign: TextAlign.left,
+                  ),
+            SizedBox(height: 16),
+            Row(
+              children: [
+                GestureDetector(
+                  onTap: () {},
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: AppColors.primaryColor),
+                    child: const Text("Online Appoinment",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: AppColors.lightTextColor,
+                        )),
+                  ),
+                ),
+                IconButton(
+                  icon:  const Icon(Icons.call_rounded),
+                  onPressed: () {onTapPhoneNumber;},
+                  color: AppColors.primaryColor,
+                ),
+              ],
+            )
           ],
         ),
       ),

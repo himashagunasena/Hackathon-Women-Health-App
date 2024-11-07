@@ -7,7 +7,8 @@ class Style{
   InputDecoration textFieldDecoration(Widget? suffix,Widget? prefix,String? text,bool readonly){
     return InputDecoration(
       labelText: text,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+      alignLabelWithHint: true,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16,vertical: 8),
       floatingLabelBehavior: FloatingLabelBehavior.never,
       border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.0),

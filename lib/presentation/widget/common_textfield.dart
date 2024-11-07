@@ -23,18 +23,25 @@ class CommonTextField extends StatelessWidget {
       this.iconButton,
       this.keyBoardType,
       this.format,
-      this.onChange, this.onTap, this.prefix, this.readOnly=false, this.hint,  this.obscureText=false});
+      this.onChange,
+      this.onTap,
+      this.prefix,
+      this.readOnly = false,
+      this.hint,
+      this.obscureText = false});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(labelText,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            )),
+        labelText == ""
+            ? const SizedBox.shrink()
+            : Text(labelText,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                )),
         const SizedBox(height: 8),
         TextField(
           readOnly: readOnly,
@@ -42,9 +49,10 @@ class CommonTextField extends StatelessWidget {
           keyboardType: keyBoardType,
           inputFormatters: format,
           onTap: onTap,
-          onChanged:onChange,
+          onChanged: onChange,
           obscureText: obscureText,
-          decoration: Style().textFieldDecoration(iconButton, prefix, hint,readOnly),
+          decoration:
+              Style().textFieldDecoration(iconButton, prefix, hint, readOnly),
         ),
       ],
     );
