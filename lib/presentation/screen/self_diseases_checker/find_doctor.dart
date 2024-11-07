@@ -81,7 +81,7 @@ class _FindDoctorScreenState extends State<FindDoctorScreen> {
             (widget.doctorWork != null && widget.doctorWork!.length > i)
                 ? widget.doctorWork![i].trim() == "e"
                     ? "No information available"
-                    : widget.doctorWork![i]
+                    : widget.doctorWork![i].trimLeft()
                 : "No information available";
         Widget userWidget = Column(
           key: subtitleKeys[i],

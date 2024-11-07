@@ -5,8 +5,10 @@ import 'package:blossom_health_app/utils/style.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:intl/intl.dart';
 
+import '../../../controller/weekly_summary_controller.dart';
 import '../../../utils/appcolor.dart';
 import '../../../utils/enum.dart';
 
@@ -221,6 +223,12 @@ class DailyHealthTrackerState extends State<DailyHealthTracker> {
   }
 
   Future<void> saveData() async {
+    WeeklyReportController(
+        userId: widget.userId,
+        model: GenerativeModel(
+          model: 'gemini-1.5-flash-latest',
+          apiKey: 'AIzaSyCD4TBsaDFFqeFrMk2nPAYSpyC0FdmygP8',
+        ));
     try {
       final data = {
         'date': DateFormat("dd/MM/yyyy").format(DateTime.now()).toString(),

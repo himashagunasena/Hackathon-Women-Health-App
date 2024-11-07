@@ -15,8 +15,6 @@ class BulletListScreen extends StatefulWidget {
 }
 
 class _BulletListScreenState extends State<BulletListScreen> {
-
-
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -27,9 +25,6 @@ class _BulletListScreenState extends State<BulletListScreen> {
         if (index >= (widget.list?.length ?? 0)) {
           return SizedBox.shrink();
         }
-
-
-
 
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
@@ -75,7 +70,7 @@ class _BulletListScreenState extends State<BulletListScreen> {
                 children: [
                   const SizedBox(width: 10),
                   Container(
-                    height:  widget.height?[index],
+                    height: widget.height?[index],
                     width: 1,
                     color: AppColors.primaryColor,
                   ),

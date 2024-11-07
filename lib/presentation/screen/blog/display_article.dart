@@ -89,7 +89,7 @@ class _ArticleListScreenState extends State<ArticleListScreen> {
             stream: FirebaseFirestore.instance.collection('articles').snapshots(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
-                return const Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator(color: AppColors.primaryColor,));
               }
 
               final articles = snapshot.data!.docs.map((doc) {

@@ -151,7 +151,7 @@ class _TextDiseaseCheckerScreenState extends State<TextDiseaseCheckerScreen> {
       });
 
       var prompt5 =
-          "Analysis the ${title} provide explanations what is the job of $doctorSpec for $diseaseName in order. If you have no idea of one doctor role please return empty string with ';' for seperate them. Separate each explanation by a ';' and return only how to work with disease each doctors don't return specialization name or any title. If cannot identify the $doctorSpec then only return 'e'.";
+          "Analysis the $title provide explanations what is the job of $doctorSpec for $diseaseName in order. If you have no idea of one doctor role please return empty string with ';' for seperate them. Separate each explanation by a ';' and return only how to work with disease each doctors don't return specialization name or any title. If cannot identify the $doctorSpec then only return 'e'.";
       final work = [Content.text(prompt5)];
       final workLoad = await _model?.generateContent(work);
       doctorWorks = workLoad?.text ?? "";

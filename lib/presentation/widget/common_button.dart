@@ -25,7 +25,7 @@ class CommonButton extends StatelessWidget {
       width:width?? MediaQuery.of(context).size.width,
       margin: EdgeInsets.only(left: margin, right: margin),
       decoration: BoxDecoration(
-          color: buttonColor,
+          color: enabled? buttonColor:AppColors.borderColor.withOpacity(0.15),
           borderRadius: const BorderRadius.all(Radius.circular(12.0))),
       child: TextButton(
         onPressed: enabled ? clickCallback as void Function()? : null,
@@ -43,7 +43,7 @@ class CommonButton extends StatelessWidget {
         child: Text(
           text,
           style: TextStyle(
-              color: textColor ?? AppColors.lightTextColor,
+              color:enabled? textColor ?? AppColors.lightTextColor:AppColors.borderColor,
               fontSize: 16,
               fontWeight: FontWeight.w600),
         ),

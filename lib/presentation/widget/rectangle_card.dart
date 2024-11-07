@@ -21,7 +21,7 @@ class RectangleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: clickCallback(),
+      onTap:()=> clickCallback(),
       child: Container(
         decoration: BoxDecoration(
             color: color, borderRadius: BorderRadius.circular(20)),
